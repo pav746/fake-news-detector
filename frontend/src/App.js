@@ -11,7 +11,7 @@ function App() {
     setResult(null);
 
     try {
-      const apiUrl = process.env.REACT_APP_API_URL || "http://127.0.0.1:8000";
+      const apiUrl = "https://fake-news-detector-backend-ecdy.onrender.com";
       const response = await fetch(`${apiUrl}/predict`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
