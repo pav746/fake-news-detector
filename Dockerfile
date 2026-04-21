@@ -1,0 +1,12 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY model/ ./model/
+COPY app.py .
+
+RUN pip install fastapi uvicorn scikit-learn pandas numpy pydantic
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
