@@ -1,9 +1,9 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pickle
 import re
 
-# Load saved model and vectorizer
 with open("model/model.pkl", "rb") as f:
     model = pickle.load(f)
 
@@ -12,11 +12,16 @@ with open("model/vectorizer.pkl", "rb") as f:
 
 app = FastAPI()
 
-# Define what input looks like
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 class Article(BaseModel):
     text: str
 
-# Clean text (same as Phase 1)
 def clean_text(text):
     text = text.lower()
     text = re.sub(r"http\S+", "", text)
@@ -24,14 +29,12 @@ def clean_text(text):
     text = re.sub(r"\s+", " ", text).strip()
     return text
 
-# Prediction endpoint
 @app.post("/predict")
 def predict(article: Article):
     cleaned = clean_text(article.text)
     vectorized = vectorizer.transform([cleaned])
     prediction = model.predict(vectorized)[0]
     confidence = model.predict_proba(vectorized)[0].max()
-    
     return {
         "label": "FAKE" if prediction == 0 else "REAL",
         "confidence": round(float(confidence), 2)
