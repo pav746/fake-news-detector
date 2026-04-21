@@ -1,0 +1,29 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install fastapi uvicorn scikit-learn pandas numpy pydantic pytest
+
+      - name: Test API starts correctly
+        run: |
+          python -c "import pickle; import app; print('App loaded successfully')"
+
+      - name: Build Docker image
+        run: docker build -t fake-news-detector .
